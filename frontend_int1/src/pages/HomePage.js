@@ -71,8 +71,6 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
 export default () => {
   const history = useHistory();
   useEffect(() => {
-    console.log("test");
-    console.log(localStorage.getItem('token'));
     if(localStorage.getItem('token') == "" || localStorage.getItem('token') == null){
       history.push("/sign-in");
     }
