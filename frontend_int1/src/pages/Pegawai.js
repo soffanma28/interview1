@@ -3,7 +3,7 @@ import { Breadcrumb, Button, ButtonGroup, Row, Col, InputGroup, Form, Dropdown, 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faPlus, faCog, faCheck, faSearch, faSlidersH } from '@fortawesome/free-solid-svg-icons';
 import Thomas from "../assets/img/team/thomas.jpg";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Routes } from "../routes";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -15,7 +15,7 @@ export default () => {
     const  [pegawaiList, setpegawaiList] = useState([]);
   
     useEffect(() => {
-        fetchpegawaiList()
+        fetchpegawaiList();
     }, [])
   
     const fetchpegawaiList = () => {

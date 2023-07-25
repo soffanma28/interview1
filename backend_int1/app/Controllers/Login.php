@@ -52,4 +52,11 @@ class Login extends BaseController
           
         return $this->respond($response, 200);
     }
+
+    public function logout()
+    {
+        $session = session();
+        $session->destroy();
+        return $this->respond(['message' => 'Logout Successfully'], 200);
+    }
 }

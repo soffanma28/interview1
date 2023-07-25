@@ -8,10 +8,12 @@ import { Row, Col, Nav, Form, Image, Navbar, Dropdown, Container, ListGroup, Inp
 import NOTIFICATIONS_DATA from "../data/notifications";
 import Profile6 from "../assets/img/team/profile-picture-6.jpg";
 import { Routes } from "../routes";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
 
 
 export default (props) => {
+  const history = useHistory();
   const [notifications, setNotifications] = useState(NOTIFICATIONS_DATA);
   const areNotificationsRead = notifications.reduce((acc, notif) => acc && notif.read, true);
 
@@ -21,6 +23,16 @@ export default (props) => {
     }, 300);
   };
 
+  const logoutAction = () => {
+    axios.post('/logout',{}, { headers:{Authorization: 'Bearer ' + localStorage.getItem('token')}})
+    .then((r) => {
+        localStorage.setItem('token', "")
+        history.push("/sign-in");
+    })
+    .catch((e) => {
+        console.log(e)
+    });
+} 
 
   const Notification = (props) => {
     const { link, sender, image, time, message, read = false } = props;
@@ -103,7 +115,7 @@ export default (props) => {
 
                 <Dropdown.Divider /> */}
 
-                <Dropdown.Item className="fw-bold" as={Link} to={Routes.Signin.path}>
+                <Dropdown.Item className="fw-bold" onClick={logoutAction}>
                   <FontAwesomeIcon icon={faSignOutAlt} className="text-danger me-2" /> Logout
                 </Dropdown.Item>
               </Dropdown.Menu>

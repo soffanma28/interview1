@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import { Routes } from "../routes";
 
 // pages
@@ -20,9 +20,13 @@ import Footer from "../components/Footer";
 import Preloader from "../components/Preloader";
 
 const RouteWithLoader = ({ component: Component, ...rest }) => {
+  const history = useHistory();
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if(localStorage.getItem('token') == "" && localStorage.getItem('token') == null){
+      history.push("/sign-in");
+    }
     const timer = setTimeout(() => setLoaded(true), 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -33,9 +37,13 @@ const RouteWithLoader = ({ component: Component, ...rest }) => {
 };
 
 const RouteWithSidebar = ({ component: Component, ...rest }) => {
+  const history = useHistory();
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if(localStorage.getItem('token') == "" && localStorage.getItem('token') == null){
+      history.push("/sign-in");
+    }
     const timer = setTimeout(() => setLoaded(true), 1000);
     return () => clearTimeout(timer);
   }, []);

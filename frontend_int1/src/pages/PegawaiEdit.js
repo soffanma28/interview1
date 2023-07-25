@@ -6,10 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faHome, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { Routes } from '../routes';
+import defaultPlaceholder from '../assets/img/default-placeholder.png';
 
 function PegawaiEdit() {
     const history = useHistory();
-    const [id, setId] = useState(useParams().id)
+    const [id, setId] = useState(useParams().id);
     const [nama, setNama] = useState('');
     const [tempat_lahir, setTempatLahir] = useState('');
     const [tanggal_lahir, setTanggalLahir] = useState('');
@@ -17,32 +18,35 @@ function PegawaiEdit() {
     const [agama, setAgama] = useState('');
     const [nohp, setNohp] = useState('');
     const [photo, setPhoto] = useState('');
+    const [preview, setPreview] = useState("");
+    const [oldphoto, setOldPhoto] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        axios.get(`/pegawai/${id}`)
-        .then(function (response) {
-            let pegawai = response.data;
-            setNama(pegawai.nama);
-            setTempatLahir(pegawai.tempat_lahir);
-            setTanggalLahir(pegawai.tanggal_lahir);
-            setJenisKelamin(pegawai.jenis_kelamin);
-            setAgama(pegawai.agama);
-            setNohp(pegawai.nohp);
-            setPhoto(pegawai.photo);
-        })
-        .catch(function (error) {
-            Swal.fire({
-                 icon: 'error',
-                title: 'An Error Occured!',
-                showConfirmButton: false,
-                timer: 1500
-            })
-        })
-          
+        getPegawai();
     }, []);
 
-    const handleUpdate = (e) => {
+    const getPegawai = async () => {
+        const response = await axios.get(`/pegawai/${id}`);
+        let pegawai = response.data;
+        setNama(pegawai.nama);
+        setTempatLahir(pegawai.tempat_lahir);
+        setTanggalLahir(pegawai.tanggal_lahir);
+        setJenisKelamin(pegawai.jenis_kelamin);
+        setAgama(pegawai.agama);
+        setNohp(pegawai.nohp);
+        setPhoto(pegawai.photo);
+        setOldPhoto(pegawai.photo);
+        setPreview(`http://localhost:8080/uploads/foto_pegawai/${pegawai.photo}`);
+    }
+
+    const loadImage = (e) => {
+        const image = e.target.files[0];
+        setPhoto(image);
+        setPreview(URL.createObjectURL(image));
+    };
+
+    const handleUpdate = async (e) => {
         e.preventDefault();
         setIsSaving(true);
         const formData = new FormData();
@@ -52,81 +56,76 @@ function PegawaiEdit() {
         formData.append('jenis_kelamin', jenis_kelamin);
         formData.append('agama', agama);
         formData.append('nohp', nohp);
-        formData.append('old_photo', photo);
+        formData.append('old_photo', oldphoto);
         formData.append('photo', photo);
-        console.log(formData);
-        // axios.put(`/pegawai/${id}`, formData, {
-        //     headers: {
-        //       "Content-Type": "multipart/form-data",
-        //     },
-        // })
-        // .then(function (response) {
-        //     console.log(response);
-        //     Swal.fire({
-        //         icon: 'success',
-        //         title: 'Pegawai updated successfully!',
-        //         showConfirmButton: false,
-        //         timer: 1500
-        //     });
-        //     setIsSaving(false);
-        //     setNama('');
-        //     setTempatLahir('');
-        //     setTanggalLahir('');
-        //     setJenisKelamin('');
-        //     setAgama('');
-        //     setNohp('');
-        //     setPhoto('');
-        //     history.push('/pegawai');
-        // })
-        // .catch(function (error) {
-        //     console.error(error);
-        //     if (error.response) {
-        //         // The request was made and the server responded with a status code
-        //         // that falls out of the range of 2xx
-        //         console.log("Error Response:");
-        //         console.log("Data", error.response.data.messages);
-        //         var ul = '<ul>';
-        //         var closeul = '</ul>';
-        //         var message = '';
-        //         const messages = error.response.data.messages;
-        //         Object.keys(messages).map((key, index) => {
-        //             message += '<li>'+messages[key]+'</li>';
-        //         })
-        //         // error.response.data.messages.map(value=> {
-        //         //     message += '<li>'+value+'</li>';
-        //         // });
-        //         Swal.fire({
-        //             icon: 'error',
-        //             html: ul + message + closeul,
-        //             showConfirmButton: false,
-        //             timer: 1500
-        //         });
-        //     } else if (error.request) {
-        //         console.log("Error Request");
-        //         // The request was made but no response was received
-        //         // `error.request` is an instance of XMLHttpRequest in the 
-        //         // browser and an instance of
-        //         // http.ClientRequest in node.js
-        //         console.log(error.request);
-        //         Swal.fire({
-        //             icon: 'error',
-        //             title: 'An Error Occured!',
-        //             showConfirmButton: false,
-        //             timer: 1500
-        //         });
-        //     } else {
-        //         console.log("Error Else");
-        //         // Something happened in setting up the request that triggered an Error
-        //         console.log('Error', error.message);
-        //         Swal.fire({
-        //             icon: 'error',
-        //             title: 'An Error Occured!',
-        //             showConfirmButton: false,
-        //             timer: 1500
-        //         });
-        //     }
-        //     setIsSaving(false);
-        // });
+        
+        try {
+            await axios.put(`/pegawai/${id}`, formData, {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+            }).then(function (response) {
+                console.log(response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pegawai updated successfully!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                setIsSaving(false);
+                history.push('/pegawai');
+            }).catch(function (error) {
+                console.error(error);
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.log("Error Response:");
+                    console.log("Data", error.response.data.messages);
+                    var ul = '<ul>';
+                    var closeul = '</ul>';
+                    var message = '';
+                    const messages = error.response.data.messages;
+                    Object.keys(messages).map((key, index) => {
+                        message += '<li>'+messages[key]+'</li>';
+                    })
+                    // error.response.data.messages.map(value=> {
+                    //     message += '<li>'+value+'</li>';
+                    // });
+                    Swal.fire({
+                        icon: 'error',
+                        html: ul + message + closeul,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else if (error.request) {
+                    console.log("Error Request");
+                    // The request was made but no response was received
+                    // `error.request` is an instance of XMLHttpRequest in the 
+                    // browser and an instance of
+                    // http.ClientRequest in node.js
+                    console.log(error.request);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'An Error Occured!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    console.log("Error Else");
+                    // Something happened in setting up the request that triggered an Error
+                    console.log('Error', error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'An Error Occured!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+                setIsSaving(false);
+            });
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -154,16 +153,39 @@ function PegawaiEdit() {
                     <Form onSubmit={handleUpdate}>
                         <Row className="justify-content-center align-items-center">
                             <Col lg={6} md={6} sm={12}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Photo</Form.Label>
-                                    <Form.Control type="hidden" name='old_photo' value={photo}/>
-                                    <Form.Control type="file" name='photo' onChange={(event)=>{setPhoto(event.target.files[0])}}/>
-                                </Form.Group>
+                                <Row>
+                                    <Col lg={4} md={6} sm={12}>
+                                        {preview ? (
+                                            <figure className="figure">
+                                                <img src={preview} className="figure-img img-fluid rounded" alt="image"/>
+                                            </figure>
+                                        ) : (
+                                            <figure className="figure">
+                                                <img src={defaultPlaceholder} className="figure-img img-fluid rounded" alt="image"/>
+                                            </figure>
+                                        )}
+                                    </Col>
+                                    <Col lg={8} md={6} sm={12}>
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Photo</Form.Label>
+                                            <Form.Control type="hidden" name='old_photo' value={oldphoto}/>
+                                            <Form.Control type="file" name='photo' onChange={loadImage}/>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
                             </Col>
                             <Col lg={6} md={6} sm={12}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Nama</Form.Label>
                                     <Form.Control type="text" name='nama' placeholder="Nama" onChange={(event)=>{setNama(event.target.value)}} value={nama}/>
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Jenis Kelamin</Form.Label>
+                                    <Form.Select name='jenis_kelamin' onChange={(event)=>{setJenisKelamin(event.target.value)}} value={jenis_kelamin}>
+                                        <option defaultValue>Jenis Kelamin</option>
+                                        <option value={'Laki-Laki'}>Laki-Laki</option>
+                                        <option value={'Perempuan'}>Perempuan</option>
+                                    </Form.Select>
                                 </Form.Group>
                             </Col>
                             <Col lg={6} md={6} sm={12}>
@@ -178,23 +200,13 @@ function PegawaiEdit() {
                                     <Form.Control type="date" name='tanggal_lahir' placeholder="Tanggal Lahir" onChange={(event)=>{setTanggalLahir(event.target.value)}} value={tanggal_lahir}/>
                                 </Form.Group>
                             </Col>
-                            <Col lg={4} md={6} sm={12}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Jenis Kelamin</Form.Label>
-                                    <Form.Select name='jenis_kelamin' onChange={(event)=>{setJenisKelamin(event.target.value)}} value={jenis_kelamin}>
-                                        <option defaultValue>Jenis Kelamin</option>
-                                        <option value={'Laki-Laki'}>Laki-Laki</option>
-                                        <option value={'Perempuan'}>Perempuan</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-                            <Col lg={4} md={6} sm={12}>
+                            <Col lg={6} md={6} sm={12}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Agama</Form.Label>
                                     <Form.Control type="text" placeholder="Agama" name='agama' onChange={(event)=>{setAgama(event.target.value)}} value={agama}/>
                                 </Form.Group>
                             </Col>
-                            <Col lg={4} md={6} sm={12}>
+                            <Col lg={6} md={6} sm={12}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>No HP</Form.Label>
                                     <Form.Control type="text" placeholder="No HP" name='nohp' onChange={(event)=>{setNohp(event.target.value)}} value={nohp}/>
