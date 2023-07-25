@@ -12,10 +12,15 @@ import Swal from "sweetalert2";
 import Profile1 from "../assets/img/team/profile-picture-1.jpg";
 
 export default () => {
+    const history = useHistory();
     const  [pegawaiList, setpegawaiList] = useState([]);
   
     useEffect(() => {
-        fetchpegawaiList();
+        if(localStorage.getItem('token') == "" || localStorage.getItem('token') == null){
+            history.push("/sign-in");
+        } else {
+              fetchpegawaiList();
+        }
     }, [])
   
     const fetchpegawaiList = () => {

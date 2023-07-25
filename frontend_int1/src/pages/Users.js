@@ -4,13 +4,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faPlus, faCog, faCheck, faSearch, faSlidersH } from '@fortawesome/free-solid-svg-icons';
 import Thomas from "../assets/img/team/thomas.jpg";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 export default () => {
 
+    const history = useHistory();
     const  [usersList, setusersList] = useState([]);
   
     useEffect(() => {
-        fetchusersList()
+        if(localStorage.getItem('token') == "" || localStorage.getItem('token') == null){
+            history.push("/sign-in");
+        } else {
+            fetchusersList();
+        }
     }, []);
   
     const fetchusersList = () => {
