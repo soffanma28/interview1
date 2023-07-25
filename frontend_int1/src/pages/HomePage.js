@@ -20,13 +20,9 @@ import Footer from "../components/Footer";
 import Preloader from "../components/Preloader";
 
 const RouteWithLoader = ({ component: Component, ...rest }) => {
-  const history = useHistory();
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if(localStorage.getItem('token') == "" && localStorage.getItem('token') == null){
-      history.push("/sign-in");
-    }
     const timer = setTimeout(() => setLoaded(true), 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -37,13 +33,9 @@ const RouteWithLoader = ({ component: Component, ...rest }) => {
 };
 
 const RouteWithSidebar = ({ component: Component, ...rest }) => {
-  const history = useHistory();
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if(localStorage.getItem('token') == "" && localStorage.getItem('token') == null){
-      history.push("/sign-in");
-    }
     const timer = setTimeout(() => setLoaded(true), 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -76,7 +68,16 @@ const RouteWithSidebar = ({ component: Component, ...rest }) => {
   );
 };
 
-export default () => (
+export default () => {
+  const history = useHistory();
+  useEffect(() => {
+    console.log("test");
+    console.log(localStorage.getItem('token'));
+    if(localStorage.getItem('token') == "" || localStorage.getItem('token') == null){
+      history.push("/sign-in");
+    }
+  });
+  return (
   <Switch>
     {/* <RouteWithLoader exact path={Routes.Presentation.path} component={Presentation} /> */}
     <RouteWithLoader exact path={Routes.Signin.path} component={Signin} />
@@ -127,4 +128,4 @@ export default () => (
 
     <Redirect to={Routes.NotFound.path} />
   </Switch>
-);
+)};
