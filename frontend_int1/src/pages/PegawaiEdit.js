@@ -40,65 +40,93 @@ function PegawaiEdit() {
             })
         })
           
-    }, [])
+    }, []);
 
-    const handleUpdate = () => {
+    const handleUpdate = (e) => {
+        e.preventDefault();
         setIsSaving(true);
-        axios.put(`/pegawai/${id}`, {
-            nama: nama,
-            tempat_lahir: tempat_lahir,
-            tanggal_lahir: tanggal_lahir,
-            jenis_kelamin: jenis_kelamin,
-            agama: agama,
-            nohp: nohp,
-            photo: photo,
-        })
-        .then(function (response) {
-            console.log(response);
-            Swal.fire({
-                icon: 'success',
-                title: 'Pegawai updated successfully!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-            setIsSaving(false);
-            setNama('');
-            setTempatLahir('');
-            setTanggalLahir('');
-            setJenisKelamin('');
-            setAgama('');
-            setNohp('');
-            setPhoto('');
-            history.push('/pegawai');
-        })
-        .catch(function (error) {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                console.log("Error Response:");
-                console.log("Data", error.response.data);
-                console.log("Status", error.response.status);
-            } else if (error.request) {
-                console.log("Error Request");
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the 
-                // browser and an instance of
-                // http.ClientRequest in node.js
-                console.log(error.request);
-            } else {
-                console.log("Error Else");
-                // Something happened in setting up the request that triggered an Error
-                console.log('Error', error.message);
-            }
-            // console.log(error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong!',
-                showConfirmButton: false,
-                timer: 1500
-            })
-            setIsSaving(false);
-        });
+        const formData = new FormData();
+        formData.append('nama', nama);
+        formData.append('tempat_lahir', tempat_lahir);
+        formData.append('tanggal_lahir', tanggal_lahir);
+        formData.append('jenis_kelamin', jenis_kelamin);
+        formData.append('agama', agama);
+        formData.append('nohp', nohp);
+        formData.append('old_photo', photo);
+        formData.append('photo', photo);
+        console.log(formData);
+        // axios.put(`/pegawai/${id}`, formData, {
+        //     headers: {
+        //       "Content-Type": "multipart/form-data",
+        //     },
+        // })
+        // .then(function (response) {
+        //     console.log(response);
+        //     Swal.fire({
+        //         icon: 'success',
+        //         title: 'Pegawai updated successfully!',
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        //     setIsSaving(false);
+        //     setNama('');
+        //     setTempatLahir('');
+        //     setTanggalLahir('');
+        //     setJenisKelamin('');
+        //     setAgama('');
+        //     setNohp('');
+        //     setPhoto('');
+        //     history.push('/pegawai');
+        // })
+        // .catch(function (error) {
+        //     console.error(error);
+        //     if (error.response) {
+        //         // The request was made and the server responded with a status code
+        //         // that falls out of the range of 2xx
+        //         console.log("Error Response:");
+        //         console.log("Data", error.response.data.messages);
+        //         var ul = '<ul>';
+        //         var closeul = '</ul>';
+        //         var message = '';
+        //         const messages = error.response.data.messages;
+        //         Object.keys(messages).map((key, index) => {
+        //             message += '<li>'+messages[key]+'</li>';
+        //         })
+        //         // error.response.data.messages.map(value=> {
+        //         //     message += '<li>'+value+'</li>';
+        //         // });
+        //         Swal.fire({
+        //             icon: 'error',
+        //             html: ul + message + closeul,
+        //             showConfirmButton: false,
+        //             timer: 1500
+        //         });
+        //     } else if (error.request) {
+        //         console.log("Error Request");
+        //         // The request was made but no response was received
+        //         // `error.request` is an instance of XMLHttpRequest in the 
+        //         // browser and an instance of
+        //         // http.ClientRequest in node.js
+        //         console.log(error.request);
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'An Error Occured!',
+        //             showConfirmButton: false,
+        //             timer: 1500
+        //         });
+        //     } else {
+        //         console.log("Error Else");
+        //         // Something happened in setting up the request that triggered an Error
+        //         console.log('Error', error.message);
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'An Error Occured!',
+        //             showConfirmButton: false,
+        //             timer: 1500
+        //         });
+        //     }
+        //     setIsSaving(false);
+        // });
     }
 
     return (
@@ -123,12 +151,13 @@ function PegawaiEdit() {
 
             <Card border="light" className="table-wrapper table-responsive shadow-sm">
                 <Card.Body>
-                    <Form>
+                    <Form onSubmit={handleUpdate}>
                         <Row className="justify-content-center align-items-center">
                             <Col lg={6} md={6} sm={12}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Photo</Form.Label>
-                                    <Form.Control type="file" name='photo' onChange={(event)=>{setPhoto(event.target.value)}}/>
+                                    <Form.Control type="hidden" name='old_photo' value={photo}/>
+                                    <Form.Control type="file" name='photo' onChange={(event)=>{setPhoto(event.target.files[0])}}/>
                                 </Form.Group>
                             </Col>
                             <Col lg={6} md={6} sm={12}>
@@ -173,7 +202,7 @@ function PegawaiEdit() {
                             </Col>
                         </Row>
                         <div className='text-center mt-3'>
-                            <Button disabled={isSaving} onClick={handleUpdate} variant="tertiary" className="m-1 w-50">Update Pegawai</Button>
+                            <Button disabled={isSaving} type='submit' variant="tertiary" className="m-1 w-50">Update Pegawai</Button>
                         </div>
                     </Form>
                 </Card.Body>

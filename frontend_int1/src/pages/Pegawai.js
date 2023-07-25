@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import Profile1 from "../assets/img/team/profile-picture-1.jpg";
 
 export default () => {
     const  [pegawaiList, setpegawaiList] = useState([]);
@@ -76,10 +77,6 @@ export default () => {
                     <Button as={Link} to={Routes.PegawaiCreate.path} variant="primary" size="sm">
                         <FontAwesomeIcon icon={faPlus} className="me-2" /> Add New Pegawai
                     </Button>
-                    <ButtonGroup className="ms-3">
-                        <Button variant="outline-primary" size="sm">Share</Button>
-                        <Button variant="outline-primary" size="sm">Export</Button>
-                    </ButtonGroup>
                 </div>
             </div>
 
@@ -92,13 +89,6 @@ export default () => {
                             </InputGroup.Text>
                             <Form.Control type="text" placeholder="Search" />
                         </InputGroup>
-                        <Form.Select className="w-25">
-                            <option defaultChecked>All</option>
-                            <option value="1">Active</option>
-                            <option value="2">Inactive</option>
-                            <option value="3">Pending</option>
-                            <option value="3">Canceled</option>
-                        </Form.Select>
                     </Col>
                     <Col xs={3} lg={8} className="text-end">
                         <Dropdown as={ButtonGroup} className="me-2">
@@ -107,22 +97,7 @@ export default () => {
                                     <FontAwesomeIcon icon={faSlidersH} />
                                 </span>
                             </Dropdown.Toggle>
-                            <Dropdown.Menu className="dropdown-menu-right">
-                                <Dropdown.Item className="fw-bold text-dark">Show</Dropdown.Item>
-                                <Dropdown.Item className="d-flex fw-bold">
-                                    10 <span className="icon icon-small ms-auto"><FontAwesomeIcon icon={faCheck} /></span>
-                                </Dropdown.Item>
-                                <Dropdown.Item className="fw-bold">20</Dropdown.Item>
-                                <Dropdown.Item className="fw-bold">30</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <Dropdown as={ButtonGroup}>
-                            <Dropdown.Toggle split as={Button} variant="link" className="text-dark m-0 p-0">
-                                <span className="icon icon-sm icon-gray">
-                                    <FontAwesomeIcon icon={faCog} />
-                                </span>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="dropdown-menu-right">
+                            <Dropdown.Menu className="custom-dropdown-menu" style={{ right: 'unset!important' }}>
                                 <Dropdown.Item className="fw-bold text-dark">Show</Dropdown.Item>
                                 <Dropdown.Item className="d-flex fw-bold">
                                     10 <span className="icon icon-small ms-auto"><FontAwesomeIcon icon={faCheck} /></span>
@@ -140,6 +115,7 @@ export default () => {
                     <Table hover className="user-table align-items-center">
                         <thead>
                             <tr>
+                                <th className="border-bottom">Foto</th>
                                 <th className="border-bottom">Nama</th>
                                 <th className="border-bottom">Tempat, Tanggal Lahir</th>
                                 <th className="border-bottom">Jenis Kelamin</th>
@@ -152,6 +128,7 @@ export default () => {
                             {pegawaiList.map((pegawai, key) => {
                                 return (
                                     <tr key={key}>
+                                        <td><img src={`http://localhost:8080/uploads/foto_pegawai/${pegawai.photo}`} height={150}/></td>
                                         <td>{pegawai.nama}</td>
                                         <td>{pegawai.tempat_lahir}, {pegawai.tanggal_lahir}</td>
                                         <td>{pegawai.jenis_kelamin}</td>
@@ -163,28 +140,13 @@ export default () => {
                                                 to={`/pegawai/edit/${pegawai.id}`}>
                                                 Edit
                                             </Link>
-                                            <Button variant='danger' onClick={()=>handleDelete(pegawai.id)}>
+                                            <Button variant='outline-danger' onClick={()=>handleDelete(pegawai.id)}>
                                                 Delete
                                             </Button>
                                         </td>
                                     </tr>
                                 );
                             })}
-                            {/* <tr>
-                                <td>
-                                    <Card.Link className="d-flex align-items-center">
-                                        <Image src={Thomas} className="user-avatar rounded-circle me-3" />
-                                        <div className="d-block">
-                                            <span className="fw-bold">Thomas Shelby</span>
-                                        </div>
-                                    </Card.Link>
-                                </td>
-                                <td>Tasikmalaya, 20 Januari 2000</td>
-                                <td>Laki - Laki</td>
-                                <td>Islam</td>
-                                <td>082113613388</td>
-                                <td></td>
-                            </tr> */}
                         </tbody>
                     </Table>
                 </Card.Body>

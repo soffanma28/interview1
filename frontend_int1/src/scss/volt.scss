@@ -43,3 +43,9 @@
 @import "volt/components";
 
 // write your custom styles here!
+.dropdown-menu[style] {
+    right: unset !important;
+}
+.custom-dropdown-menu {
+    right: unset !important;
+}

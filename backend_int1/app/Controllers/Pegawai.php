@@ -54,12 +54,15 @@ class Pegawai extends ResourceController
             'jenis_kelamin' => 'required',
             'agama' => 'required',
             'nohp' => 'required',
-            'photo' => 'required',
+            'photo' => 'mime_in[photo,image/jpg,image/jpeg,image/gif,image/png]|max_size[photo,300]',
         ]);
 
         if (!$validation) {
             return $this->failValidationErrors($this->validator->getErrors());
         }
+
+        $file = $this->request->getFile('photo');
+		$fileName = $file->getRandomName();
 
         $pegawai = [
             'nama' => $this->request->getVar('nama'),
@@ -68,8 +71,9 @@ class Pegawai extends ResourceController
             'jenis_kelamin' => $this->request->getVar('jenis_kelamin'),
             'agama' => $this->request->getVar('agama'),
             'nohp' => $this->request->getVar('nohp'),
-            'photo' => $this->request->getVar('photo'),
+            'photo' => $fileName,
         ];
+        $file->move('uploads/foto_pegawai/', $fileName);
 
         $pegawaiId = $this->pegawai->insert($pegawai);
         if ($pegawaiId) {
@@ -97,11 +101,20 @@ class Pegawai extends ResourceController
                 'jenis_kelamin' => 'required',
                 'agama' => 'required',
                 'nohp' => 'required',
-                'photo' => 'required',
+                'photo' => 'mime_in[photo,image/jpg,image/jpeg,image/gif,image/png]|max_size[photo,300]',
             ]);
 
             if (!$validation) {
                 return $this->failValidationErrors($this->validator->getErrors());
+            }
+
+            $fileName = $this->request->getVar('old_photo');
+            if($this->request->hasFile('photo')) {
+                $file = $this->request->getFile('photo');
+		        $fileName = $file->getRandomName();
+                $file->move('uploads/foto_pegawai/', $fileName);
+            } else {
+                $fileName = $this->request->getVar('old_photo');
             }
 
             $pegawai = [
@@ -112,7 +125,7 @@ class Pegawai extends ResourceController
                 'jenis_kelamin' => $this->request->getVar('jenis_kelamin'),
                 'agama' => $this->request->getVar('agama'),
                 'nohp' => $this->request->getVar('nohp'),
-                'photo' => $this->request->getVar('photo'),
+                'photo' => $fileName,
             ];
 
             $response = $this->pegawai->save($pegawai);

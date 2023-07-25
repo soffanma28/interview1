@@ -20,14 +20,18 @@ function PegawaiCreate() {
 
     const handleSave = () => {
         setIsSaving(true);
-        axios.post('/pegawai', {
-            nama: nama,
-            tempat_lahir: tempat_lahir,
-            tanggal_lahir: tanggal_lahir,
-            jenis_kelamin: jenis_kelamin,
-            agama: agama,
-            nohp: nohp,
-            photo: photo,
+        const formData = new FormData();
+        formData.append('nama', nama);
+        formData.append('tempat_lahir', tempat_lahir);
+        formData.append('tanggal_lahir', tanggal_lahir);
+        formData.append('jenis_kelamin', jenis_kelamin);
+        formData.append('agama', agama);
+        formData.append('nohp', nohp);
+        formData.append('photo', photo);
+        axios.post('/pegawai', formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
         })
         .then(function (response) {
             console.log(response);
@@ -52,8 +56,23 @@ function PegawaiCreate() {
                 // The request was made and the server responded with a status code
                 // that falls out of the range of 2xx
                 console.log("Error Response:");
-                console.log("Data", error.response.data);
-                console.log("Status", error.response.status);
+                console.log("Data", error.response.data.messages);
+                var ul = '<ul>';
+                var closeul = '</ul>';
+                var message = '';
+                const messages = error.response.data.messages;
+                Object.keys(messages).map((key, index) => {
+                    message += '<li>'+messages[key]+'</li>';
+                })
+                // error.response.data.messages.map(value=> {
+                //     message += '<li>'+value+'</li>';
+                // });
+                Swal.fire({
+                    icon: 'error',
+                    html: ul + message + closeul,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             } else if (error.request) {
                 console.log("Error Request");
                 // The request was made but no response was received
@@ -61,18 +80,23 @@ function PegawaiCreate() {
                 // browser and an instance of
                 // http.ClientRequest in node.js
                 console.log(error.request);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'An Error Occured!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             } else {
                 console.log("Error Else");
                 // Something happened in setting up the request that triggered an Error
                 console.log('Error', error.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'An Error Occured!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             }
-            // console.log(error);
-            Swal.fire({
-                icon: 'error',
-                title: 'An Error Occured!',
-                showConfirmButton: false,
-                timer: 1500
-            })
             setIsSaving(false);
         });
     }
@@ -104,7 +128,7 @@ function PegawaiCreate() {
                             <Col lg={6} md={6} sm={12}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Photo</Form.Label>
-                                    <Form.Control type="file" name='photo' onChange={(event)=>{setPhoto(event.target.value)}}/>
+                                    <Form.Control type="file" name='photo' onChange={(event)=>{setPhoto(event.target.files[0])}}/>
                                 </Form.Group>
                             </Col>
                             <Col lg={6} md={6} sm={12}>
